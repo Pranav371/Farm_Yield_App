@@ -1,24 +1,28 @@
 import 'dart:convert';
 
+import 'package:farm_yield/models/expenses.dart';
 import 'package:farm_yield/models/workers.dart';
 import 'package:http/http.dart' as http;
 
+const baseUrl = "http://10.76.166.211:5000";
 
-const baseUrl = "http://10.17.187.174:5000";
+// Workers Page Endpoints
 
 Future<List<Workers>> fetchWorkers() async {
-  final response = await http.get(Uri.parse("$baseUrl/workers"));
+  final response = await http.get(Uri.parse("${baseUrl}/workers"));
 
   if (response.statusCode == 200) {
     final List<dynamic> jsonList = jsonDecode(response.body);
-    return jsonList.map((json) => Workers.fromJson(json as Map<String, dynamic>)).toList();
+    return jsonList
+        .map((json) => Workers.fromJson(json as Map<String, dynamic>))
+        .toList();
   } else {
     throw Exception("Failed to fetch Workers");
   }
 }
 
-Future<bool> addWorker(String name, String phone) async{
-  final url = Uri.parse("http://10.0.2.2:5000/add-worker");
+Future<bool> addWorker(String name, String phone) async {
+  final url = Uri.parse("${baseUrl}/add-worker");
   try {
     final response = await http.post(
       url,
@@ -39,7 +43,7 @@ Future<bool> addWorker(String name, String phone) async{
 }
 
 Future<bool> updateWorker(int id, String name, String phoneNo) async {
-  final url = Uri.parse("http://10.0.2.2:5000/update-worker/$id");
+  final url = Uri.parse("${baseUrl}/update-worker/$id");
   try {
     final response = await http.put(
       url,
@@ -60,7 +64,7 @@ Future<bool> updateWorker(int id, String name, String phoneNo) async {
 }
 
 Future<bool> deleteWorker(int id) async {
-  final url = Uri.parse("http://10.0.2.2:5000/delete-worker/$id");
+  final url = Uri.parse("${baseUrl}/delete-worker/$id");
   try {
     final response = await http.delete(url);
 
@@ -73,5 +77,21 @@ Future<bool> deleteWorker(int id) async {
   } catch (e) {
     print("Error deleting worker: $e");
     return false;
+  }
+}
+
+//Expense Page Endpoints
+
+Future<List<Expenses>> fetchExpenses() async {
+  final response = await http.get(Uri.parse('${baseUrl}/expenses'));
+  if (response.statusCode == 200) {
+    final List<dynamic> jsonList = jsonDecode(response.body);
+    return jsonList
+        .map((json) => Expenses.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  else{
+    throw Exception("Failed to fetch Expenses");
   }
 }
