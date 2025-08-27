@@ -1,5 +1,6 @@
 import 'package:farm_yield/data/data.dart';
 import 'package:farm_yield/models/expenses.dart';
+import 'package:farm_yield/widgets/expense_form.dart';
 import 'package:farm_yield/widgets/expenses_card-widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -21,8 +22,7 @@ class _ExpensesPageState extends State<ExpensesPage> {
     super.initState();
   }
 
-
-  String formatExpensesDate(DateTime date){
+  String formatExpensesDate(DateTime date) {
     return DateFormat('EEE, yyyy-MM-dd  hh:mm a').format(date);
   }
 
@@ -109,7 +109,9 @@ class _ExpensesPageState extends State<ExpensesPage> {
                     expensePaidTo: expense.expense_paid_to,
                     expenseAmount: expense.expense_amount,
                     expenseId: expense.expense_id,
-                    expenseTimestamp: formatExpensesDate(expense.expense_timestamp),
+                    expenseTimestamp: formatExpensesDate(
+                      expense.expense_timestamp,
+                    ),
                   );
                 }, childCount: expenses.length),
               );
@@ -120,7 +122,32 @@ class _ExpensesPageState extends State<ExpensesPage> {
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add),
         label: const Text("Add Expenses"),
-        onPressed: () {},
+        onPressed: () async {
+  final result = await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) => Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+        left: 16,
+        right: 16,
+        top: 20,
+      ),
+      child: AddExpenseForm(onSubmit: (String category, int amount, String paidTo) {  },),
+    ),
+  );
+
+  if (result == true) {
+    // Refresh list after successful insert
+    setState(() {
+      expenses = fetchExpenses();
+    });
+  }
+},
+
       ),
     );
   }

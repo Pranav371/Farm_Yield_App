@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:farm_yield/models/expenses.dart';
 import 'package:farm_yield/models/workers.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 const baseUrl = "http://10.76.166.211:5000";
@@ -93,5 +94,39 @@ Future<List<Expenses>> fetchExpenses() async {
 
   else{
     throw Exception("Failed to fetch Expenses");
+  }
+}
+
+
+
+Future<void> addExpenseAPI(BuildContext context, String category, int amount, String paidTo) async {
+  try {
+    final response = await http.post(
+      Uri.parse("${baseUrl}/expenses/add"), // update with your server host:port
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "expense_category": category,
+        "expense_amount": amount,
+        "expense_paid_to": paidTo,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Expense Added Successfully ✅")),
+      );
+    } else {
+
+      final msg = jsonDecode(response.body)["Error"] ?? "Something went wrong";
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $msg")),
+      );
+    }
+  } catch (e) {
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error: $e")),
+    );
   }
 }
