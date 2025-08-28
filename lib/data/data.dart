@@ -5,7 +5,7 @@ import 'package:farm_yield/models/workers.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-const baseUrl = "http://10.76.166.211:5000";
+const baseUrl = "http://10.76.166.238:5000";
 
 // Workers Page Endpoints
 
@@ -97,12 +97,10 @@ Future<List<Expenses>> fetchExpenses() async {
   }
 }
 
-
-
 Future<void> addExpenseAPI(BuildContext context, String category, int amount, String paidTo) async {
   try {
     final response = await http.post(
-      Uri.parse("${baseUrl}/expenses/add"), // update with your server host:port
+      Uri.parse("${baseUrl}/expenses/add"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "expense_category": category,
@@ -128,5 +126,29 @@ Future<void> addExpenseAPI(BuildContext context, String category, int amount, St
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Error: $e")),
     );
+  }
+}
+
+Future<int> fetchTotalAmount() async {
+  try {
+    final response = await http.get(
+      Uri.parse("${baseUrl}/expenses/total")
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonBody = jsonDecode(response.body);
+
+      // convert to int safely
+      final total = (jsonBody['total_expenses'] as num).toInt();
+
+      print("Total Expenses: $total");
+      return total;
+    } else {
+      print("Failed to load total. Status code: ${response.statusCode}");
+      return 0;
+    }
+  } catch (e) {
+    print("Error fetching total: $e");
+    return 0;
   }
 }
